@@ -256,7 +256,7 @@ public:
     ///
     /// \The caller application can set the timeout value to Zero(0) to make this interface always returns immediately to achieve non-block operation.
     DEPRECATED(virtual u_result grabScanData(rplidar_response_measurement_node_t * nodebuffer, size_t & count, _u32 timeout = DEFAULT_TIMEOUT)) = 0;
-    DEPRECATED(virtual u_result grabScanDataRobotPos(rplidar_response_measurement_node_robotpos_t * nodebuffer, size_t & count, _u32 timeout = DEFAULT_TIMEOUT)) = 0;
+    DEPRECATED(virtual u_result grabScanData(rplidar_response_measurement_node_robotpos_t * nodebuffer, size_t & count, _u32 timeout = DEFAULT_TIMEOUT)) = 0;
 
 
     /// Wait and grab a complete 0-360 degree scan data previously received.

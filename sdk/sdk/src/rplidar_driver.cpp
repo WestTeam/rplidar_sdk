@@ -317,7 +317,7 @@ u_result RPlidarDriverImplCommon::getFrequency(const RplidarScanMode& scanMode, 
 
 
 
-u_result RPlidarDriverImplCommon::_waitNodeRobotPos(rplidar_response_measurement_node_robotpos_t * node, _u32 timeout)
+u_result RPlidarDriverImplCommon::_waitNode(rplidar_response_measurement_node_robotpos_t * node, _u32 timeout)
 {
     int  recvPos = 0;
     _u32 startTs = getms();
@@ -429,7 +429,7 @@ u_result RPlidarDriverImplCommon::_waitNode(rplidar_response_measurement_node_t 
 }
 
 
-u_result RPlidarDriverImplCommon::_waitScanDataRobotPos(rplidar_response_measurement_node_robotpos_t * nodebuffer, size_t & count, _u32 timeout)
+u_result RPlidarDriverImplCommon::_waitScanData(rplidar_response_measurement_node_robotpos_t * nodebuffer, size_t & count, _u32 timeout)
 {
     if (!_isConnected) {
         count = 0;
@@ -443,7 +443,7 @@ u_result RPlidarDriverImplCommon::_waitScanDataRobotPos(rplidar_response_measure
 
     while ((waitTime = getms() - startTs) <= timeout && recvNodeCount < count) {
         rplidar_response_measurement_node_robotpos_t node;
-        if (IS_FAIL(ans = _waitNodeRobotPos(&node, timeout - waitTime))) {
+        if (IS_FAIL(ans = _waitNode(&node, timeout - waitTime))) {
             return ans;
         }
 
@@ -662,11 +662,11 @@ u_result RPlidarDriverImplCommon::_cacheScanDataRobotPos()
     u_result                                 ans;
     memset(local_scan, 0, sizeof(local_scan));
 
-    _waitScanDataRobotPos(local_buf, count); // // always discard the first data since it may be incomplete
+    _waitScanData(local_buf, count); // // always discard the first data since it may be incomplete
 
     while(_isScanning)
     {
-        if (IS_FAIL(ans=_waitScanDataRobotPos(local_buf, count))) {
+        if (IS_FAIL(ans=_waitScanData(local_buf, count))) {
             if (ans != RESULT_OPERATION_TIMEOUT) {
                 _isScanning = false;
                 return RESULT_OPERATION_FAIL;
@@ -1992,7 +1992,7 @@ u_result RPlidarDriverImplCommon::stop(_u32 timeout)
     return RESULT_OK;
 }
 
-u_result RPlidarDriverImplCommon::grabScanDataRobotPos(rplidar_response_measurement_node_robotpos_t * nodebuffer, size_t & count, _u32 timeout)
+u_result RPlidarDriverImplCommon::grabScanData(rplidar_response_measurement_node_robotpos_t * nodebuffer, size_t & count, _u32 timeout)
 {
     DEPRECATED_WARN("grabScanData()", "grabScanDataHq()");
 

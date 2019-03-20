@@ -72,7 +72,7 @@ public:
     virtual u_result checkExpressScanSupported(bool & support, _u32 timeout = DEFAULT_TIMEOUT);
     virtual u_result stop(_u32 timeout = DEFAULT_TIMEOUT);
     virtual u_result grabScanData(rplidar_response_measurement_node_t * nodebuffer, size_t & count, _u32 timeout = DEFAULT_TIMEOUT);
-    virtual u_result grabScanDataRobotPos(rplidar_response_measurement_node_robotpos_t * nodebuffer, size_t & count, _u32 timeout = DEFAULT_TIMEOUT);
+    virtual u_result grabScanData(rplidar_response_measurement_node_robotpos_t * nodebuffer, size_t & count, _u32 timeout = DEFAULT_TIMEOUT);
 
     virtual u_result grabScanDataHq(rplidar_response_measurement_node_hq_t * nodebuffer, size_t & count, _u32 timeout = DEFAULT_TIMEOUT);
 
@@ -94,10 +94,10 @@ protected:
 
 
     virtual u_result _waitScanData(rplidar_response_measurement_node_t * nodebuffer, size_t & count, _u32 timeout = DEFAULT_TIMEOUT);
-    virtual u_result _waitScanDataRobotPos(rplidar_response_measurement_node_robotpos_t * nodebuffer, size_t & count, _u32 timeout = DEFAULT_TIMEOUT);
+    virtual u_result _waitScanData(rplidar_response_measurement_node_robotpos_t * nodebuffer, size_t & count, _u32 timeout = DEFAULT_TIMEOUT);
 
     virtual u_result _waitNode(rplidar_response_measurement_node_t * node, _u32 timeout = DEFAULT_TIMEOUT);
-    virtual u_result _waitNodeRobotPos(rplidar_response_measurement_node_robotpos_t * node, _u32 timeout = DEFAULT_TIMEOUT);
+    virtual u_result _waitNode(rplidar_response_measurement_node_robotpos_t * node, _u32 timeout = DEFAULT_TIMEOUT);
 
     virtual u_result  _cacheCapsuledScanData();
     virtual u_result _waitCapsuledNode(rplidar_response_capsule_measurement_nodes_t & node, _u32 timeout = DEFAULT_TIMEOUT);

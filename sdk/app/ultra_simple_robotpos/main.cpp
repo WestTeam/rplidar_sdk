@@ -202,7 +202,7 @@ int main(int argc, const char * argv[]) {
         rplidar_response_measurement_node_robotpos_t nodes[8192];
         size_t   count = _countof(nodes);
 
-        op_result = drv->grabScanDataRobotPos(nodes, count);
+        op_result = drv->grabScanData(nodes, count);
 
         if (IS_OK(op_result)) {
             drv->ascendScanData(nodes, count);
