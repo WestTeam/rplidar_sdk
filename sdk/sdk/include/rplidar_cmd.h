@@ -8,26 +8,26 @@
  *
  */
 /*
- * Redistribution and use in source and binary forms, with or without 
+ * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
- * 1. Redistributions of source code must retain the above copyright notice, 
+ * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  *
- * 2. Redistributions in binary form must reproduce the above copyright notice, 
- *    this list of conditions and the following disclaimer in the documentation 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, 
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; 
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
@@ -70,14 +70,14 @@
 
 // Payloads
 // ------------------------------------------
-#define RPLIDAR_EXPRESS_SCAN_MODE_NORMAL      0 
+#define RPLIDAR_EXPRESS_SCAN_MODE_NORMAL      0
 #define RPLIDAR_EXPRESS_SCAN_MODE_FIXANGLE    0  // won't been supported but keep to prevent build fail
 //for express working flag(extending express scan protocol)
-#define RPLIDAR_EXPRESS_SCAN_FLAG_BOOST                 0x0001 
+#define RPLIDAR_EXPRESS_SCAN_FLAG_BOOST                 0x0001
 #define RPLIDAR_EXPRESS_SCAN_FLAG_SUNLIGHT_REJECTION    0x0002
 
 //for ultra express working flag
-#define RPLIDAR_ULTRAEXPRESS_SCAN_FLAG_STD                 0x0001 
+#define RPLIDAR_ULTRAEXPRESS_SCAN_FLAG_STD                 0x0001
 #define RPLIDAR_ULTRAEXPRESS_SCAN_FLAG_HIGH_SENSITIVITY    0x0002
 
 #define RPLIDAR_HQ_SCAN_FLAG_CCW            (0x1<<0)
@@ -114,6 +114,7 @@ typedef struct _rplidar_payload_acc_board_flag_t {
 #define RPLIDAR_ANS_TYPE_DEVINFO          0x4
 #define RPLIDAR_ANS_TYPE_DEVHEALTH        0x6
 
+#define RPLIDAR_ANS_TYPE_MEASUREMENT_ROBOTPOS       0x80
 #define RPLIDAR_ANS_TYPE_MEASUREMENT                0x81
 // Added in FW ver 1.17
 #define RPLIDAR_ANS_TYPE_MEASUREMENT_CAPSULED       0x82
@@ -159,6 +160,17 @@ typedef struct _rplidar_response_measurement_node_t {
     _u16   distance_q2;
 } __attribute__((packed)) rplidar_response_measurement_node_t;
 
+typedef struct _rplidar_response_measurement_node_robotpos_t {
+    _u8    sync_quality;      // syncbit:1;syncbit_inverse:1;quality:6;
+    _u16   angle_q6_checkbit; // check_bit:1;angle_q6:15;
+    _u16   distance_q2;
+    _s16   pos_x;
+    _s16   pos_y;
+    _s16   pos_teta;
+} __attribute__((packed)) rplidar_response_measurement_node_robotpos_t;
+
+
+
 //[distance_sync flags]
 #define RPLIDAR_RESP_MEASUREMENT_EXP_ANGLE_MASK           (0x3)
 #define RPLIDAR_RESP_MEASUREMENT_EXP_DISTANCE_MASK        (0xFC)
@@ -166,8 +178,8 @@ typedef struct _rplidar_response_measurement_node_t {
 typedef struct _rplidar_response_cabin_nodes_t {
     _u16   distance_angle_1; // see [distance_sync flags]
     _u16   distance_angle_2; // see [distance_sync flags]
-    _u8    offset_angles_q3;  
-} __attribute__((packed)) rplidar_response_cabin_nodes_t;   
+    _u8    offset_angles_q3;
+} __attribute__((packed)) rplidar_response_cabin_nodes_t;
 
 
 #define RPLIDAR_RESP_MEASUREMENT_EXP_SYNC_1               0xA
@@ -204,7 +216,7 @@ typedef struct _rplidar_response_ultra_cabin_nodes_t {
     // 31                                              0
     // | predict2 10bit | predict1 10bit | major 12bit |
     _u32 combined_x3;
-} __attribute__((packed)) rplidar_response_ultra_cabin_nodes_t;  
+} __attribute__((packed)) rplidar_response_ultra_cabin_nodes_t;
 
 typedef struct _rplidar_response_ultra_capsule_measurement_nodes_t {
     _u8                             s_checksum_1; // see [s_checksum_1]
@@ -214,11 +226,22 @@ typedef struct _rplidar_response_ultra_capsule_measurement_nodes_t {
 } __attribute__((packed)) rplidar_response_ultra_capsule_measurement_nodes_t;
 
 typedef struct rplidar_response_measurement_node_hq_t {
-    _u16   angle_z_q14; 
-    _u32   dist_mm_q2; 
-    _u8    quality;  
+    _u16   angle_z_q14;
+    _u32   dist_mm_q2;
+    _u8    quality;
     _u8    flag;
 } __attribute__((packed)) rplidar_response_measurement_node_hq_t;
+
+typedef struct rplidar_response_measurement_node_hq_robotpos_t {
+    _u16   angle_z_q14;
+    _u32   dist_mm_q2;
+    _u8    quality;
+    _u8    flag;
+    _s16   pos_x;
+    _s16   pos_y;
+    _s16   pos_teta;
+} __attribute__((packed)) rplidar_response_measurement_node_hq_robotpos_t;
+
 
 typedef struct _rplidar_response_hq_capsule_measurement_nodes_t{
     _u8 sync_byte;
@@ -241,7 +264,7 @@ typedef struct _rplidar_response_hq_capsule_measurement_nodes_t{
 #define RPLIDAR_CONF_MIN_ROT_FREQ                   0x00000004
 #define RPLIDAR_CONF_MAX_ROT_FREQ                   0x00000005
 #define RPLIDAR_CONF_MAX_DISTANCE                   0x00000060
-        
+
 #define RPLIDAR_CONF_SCAN_MODE_COUNT                0x00000070
 #define RPLIDAR_CONF_SCAN_MODE_US_PER_SAMPLE        0x00000071
 #define RPLIDAR_CONF_SCAN_MODE_MAX_DISTANCE         0x00000074

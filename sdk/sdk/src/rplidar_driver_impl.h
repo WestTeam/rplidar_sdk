@@ -8,26 +8,26 @@
  *
  */
 /*
- * Redistribution and use in source and binary forms, with or without 
+ * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
- * 1. Redistributions of source code must retain the above copyright notice, 
+ * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  *
- * 2. Redistributions in binary form must reproduce the above copyright notice, 
- *    this list of conditions and the following disclaimer in the documentation 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, 
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; 
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
@@ -39,7 +39,7 @@ namespace rp { namespace standalone{ namespace rplidar {
 {
 public:
 
-    virtual bool isConnected();     
+    virtual bool isConnected();
     virtual u_result reset(_u32 timeout = DEFAULT_TIMEOUT);
     virtual u_result clearNetSerialRxCache();
     virtual u_result getAllSupportedScanModes(std::vector<RplidarScanMode>& outModes, _u32 timeoutInMs = DEFAULT_TIMEOUT);
@@ -67,10 +67,17 @@ public:
     virtual u_result getFrequency(bool inExpressMode, size_t count, float & frequency, bool & is4kmode);
     virtual u_result getFrequency(const RplidarScanMode& scanMode, size_t count, float & frequency);
     virtual u_result startScanNormal(bool force, _u32 timeout = DEFAULT_TIMEOUT);
+    virtual u_result startScanNormalRobotPos(bool force, _u32 timeout = DEFAULT_TIMEOUT);
+
     virtual u_result checkExpressScanSupported(bool & support, _u32 timeout = DEFAULT_TIMEOUT);
     virtual u_result stop(_u32 timeout = DEFAULT_TIMEOUT);
     virtual u_result grabScanData(rplidar_response_measurement_node_t * nodebuffer, size_t & count, _u32 timeout = DEFAULT_TIMEOUT);
+    virtual u_result grabScanDataRobotPos(rplidar_response_measurement_node_robotpos_t * nodebuffer, size_t & count, _u32 timeout = DEFAULT_TIMEOUT);
+
     virtual u_result grabScanDataHq(rplidar_response_measurement_node_hq_t * nodebuffer, size_t & count, _u32 timeout = DEFAULT_TIMEOUT);
+
+
+    virtual u_result ascendScanData(rplidar_response_measurement_node_robotpos_t * nodebuffer, size_t count);
     virtual u_result ascendScanData(rplidar_response_measurement_node_t * nodebuffer, size_t count);
     virtual u_result ascendScanData(rplidar_response_measurement_node_hq_t * nodebuffer, size_t count);
     virtual u_result getScanDataWithInterval(rplidar_response_measurement_node_t * nodebuffer, size_t & count);
@@ -83,13 +90,21 @@ protected:
 
     virtual u_result _waitResponseHeader(rplidar_ans_header_t * header, _u32 timeout = DEFAULT_TIMEOUT);
     virtual u_result _cacheScanData();
+    virtual u_result _cacheScanDataRobotPos();
+
+
     virtual u_result _waitScanData(rplidar_response_measurement_node_t * nodebuffer, size_t & count, _u32 timeout = DEFAULT_TIMEOUT);
+    virtual u_result _waitScanDataRobotPos(rplidar_response_measurement_node_robotpos_t * nodebuffer, size_t & count, _u32 timeout = DEFAULT_TIMEOUT);
+
     virtual u_result _waitNode(rplidar_response_measurement_node_t * node, _u32 timeout = DEFAULT_TIMEOUT);
+    virtual u_result _waitNodeRobotPos(rplidar_response_measurement_node_robotpos_t * node, _u32 timeout = DEFAULT_TIMEOUT);
+
     virtual u_result  _cacheCapsuledScanData();
     virtual u_result _waitCapsuledNode(rplidar_response_capsule_measurement_nodes_t & node, _u32 timeout = DEFAULT_TIMEOUT);
     virtual void     _capsuleToNormal(const rplidar_response_capsule_measurement_nodes_t & capsule, rplidar_response_measurement_node_hq_t *nodebuffer, size_t &nodeCount);
+
     virtual void     _dense_capsuleToNormal(const rplidar_response_capsule_measurement_nodes_t & capsule, rplidar_response_measurement_node_hq_t *nodebuffer, size_t &nodeCount);
-    
+
     //FW1.23
     virtual u_result  _cacheUltraCapsuledScanData();
     virtual u_result _waitUltraCapsuledNode(rplidar_response_ultra_capsule_measurement_nodes_t & node, _u32 timeout = DEFAULT_TIMEOUT);
@@ -99,14 +114,16 @@ protected:
     virtual u_result _waitHqNode(rplidar_response_hq_capsule_measurement_nodes_t & node, _u32 timeout = DEFAULT_TIMEOUT);
     virtual void     _HqToNormal(const rplidar_response_hq_capsule_measurement_nodes_t & node_hq, rplidar_response_measurement_node_hq_t *nodebuffer, size_t &nodeCount);
 
-    bool     _isConnected; 
+    bool     _isConnected;
     bool     _isScanning;
     bool     _isSupportingMotorCtrl;
 
     rplidar_response_measurement_node_hq_t   _cached_scan_node_hq_buf[8192];
+    rplidar_response_measurement_node_hq_robotpos_t   _cached_scan_node_hq_buf_robotpos[8192];
     size_t                                   _cached_scan_node_hq_count;
 
     rplidar_response_measurement_node_hq_t   _cached_scan_node_hq_buf_for_interval_retrieve[8192];
+    rplidar_response_measurement_node_hq_robotpos_t   _cached_scan_node_hq_buf_robotpos_for_interval_retrieve[8192];
     size_t                                   _cached_scan_node_hq_count_for_interval_retrieve;
 
     _u16                    _cached_sampleduration_std;
@@ -120,7 +137,6 @@ protected:
     bool                                         _is_previous_capsuledataRdy;
     bool                                         _is_previous_HqdataRdy;
 
-	
 
     rp::hal::Locker         _lock;
     rp::hal::Event          _dataEvt;
